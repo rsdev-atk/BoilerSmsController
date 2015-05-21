@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Сервис управления котлами</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="editBoiler">Редактирование котлов</string>
+    <string name="get_admin">Авторизация</string>
+    <string name="title_activity_edit_boiler">Редактирование котлов</string>
+    <string name="title_activity_add_new_boiler">AddNewBoilerActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="add_new_boiler">Новый котел успешно создан</string>
+
+
+
+
+
+
+
+
+
+</resources>
