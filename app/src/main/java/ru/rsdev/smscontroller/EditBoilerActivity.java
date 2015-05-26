@@ -1,6 +1,8 @@
 package ru.rsdev.smscontroller;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.SmsManager;
@@ -11,10 +13,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class EditBoilerActivity extends ActionBarActivity implements SeekBar.OnSeekBarChangeListener
 {
+    private SQLiteDatabase database;
+
     EditText editName,editNumber,editParam1,editParam2,editParam3,editParam4;
     SeekBar seekBar1,seekBar2, seekBar3, seekBar4;
     Button btnSend;
@@ -83,9 +88,25 @@ public class EditBoilerActivity extends ActionBarActivity implements SeekBar.OnS
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.add_boiler_item) {
+
+            Intent addIntent = new Intent(this,AddNewBoilerActivity.class);
+            startActivity(addIntent);
             return true;
         }
+
+        if (id == R.id.dell_boiler_item) {
+
+            ExternalDbOpenHelper dbOpenHelper = new ExternalDbOpenHelper(this);
+            database = dbOpenHelper.openDataBase();
+            String name = editName.getText().toString();
+            database.delete("BoilerTable", "Name = '" + name + "'", null);
+            Toast.makeText(getApplication(),R.string.dell_boiler,Toast.LENGTH_SHORT).show();
+            this.finish();
+
+            return true;
+        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -119,25 +140,51 @@ public class EditBoilerActivity extends ActionBarActivity implements SeekBar.OnS
     public void ClickButton(View view) {
         switch (view.getId()){
             case R.id.btnSend:
-                //Send sms
-                SmsManager smsManager = SmsManager.getDefault();
-                String smsNumber = editNumber.getText().toString();
-                //String smsText = "Тестовое сообщние из Android";
-
-                String smsText = textView.getText().toString() + " " + editParam1.getText().toString() + " " +
-                                 textView2.getText().toString() + " " + editParam2.getText().toString() + " " +
-                                 textView3.getText().toString() + " " + editParam3.getText().toString() + " " +
-                                 textView4.getText().toString() + " " + editParam4.getText().toString() + " ";
-
-
-
-                //smsText = EntityUtils.toString(httpEntity, "UTF-8");
-
-                smsManager.sendTextMessage(smsNumber, null, smsText, null, null);
-
-
+                //SendSMS();
+                PutDataInDB();
+                finish();
                 break;
         }
 
     }
+
+    private void SendSMS()
+    {
+        SmsManager smsManager = SmsManager.getDefault();
+        String smsNumber = editNumber.getText().toString();
+        //String smsText = "Тестовое сообщние из Android";
+
+        String smsText = textView.getText().toString() + " " + editParam1.getText().toString() + " " +
+                textView2.getText().toString() + " " + editParam2.getText().toString() + " " +
+                textView3.getText().toString() + " " + editParam3.getText().toString() + " " +
+                textView4.getText().toString() + " " + editParam4.getText().toString() + " ";
+
+
+
+        //smsText = EntityUtils.toString(httpEntity, "UTF-8");
+
+        smsManager.sendTextMessage(smsNumber, null, smsText, null, null);
+    }
+
+    private void PutDataInDB()
+    {
+        ExternalDbOpenHelper dbOpenHelper = new ExternalDbOpenHelper(this);
+        SQLiteDatabase database = dbOpenHelper.openDataBase();
+
+        ContentValues cv = new ContentValues();
+        cv.put("Name", editName.getText().toString());
+        cv.put("Param1", editParam1.getText().toString());
+        cv.put("Param2", editParam2.getText().toString());
+        cv.put("Param3", editParam3.getText().toString());
+        cv.put("Param4", editParam4.getText().toString());
+        cv.put("SmsNumber", editNumber.getText().toString());
+
+        //long rowID = database.insert("BoilerTable", null, cv);
+        database.update("BoilerTable", cv, "Name = ?", new String[]{editName.getText().toString() });
+
+        Toast.makeText(getApplication(),R.string.pun_new_data, Toast.LENGTH_SHORT).show();
+
+    }
+
+
 }
