@@ -1,6 +1,8 @@
 package ru.rsdev.smscontroller;
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -47,13 +49,13 @@ public class MainActivity extends ActionBarActivity {
 
                 Intent intentEdit = new Intent(MainActivity.this, EditBoilerActivity.class);
 
-                String nameBoiler = data.get(position).get("txtBoilerName").toString();
-                String numberBoiler = data.get(position).get("txtSmsNumber").toString();
+                String nameBoiler = data.get(position).get("txtBoilerName");
+                String numberBoiler = data.get(position).get("txtSmsNumber");
 
-                String param1 = data.get(position).get("txtParamEdit1").toString();
-                String param2 = data.get(position).get("txtParamEdit2").toString();
-                String param3 = data.get(position).get("txtParamEdit3").toString();
-                String param4 = data.get(position).get("txtParamEdit4").toString();
+                String param1 = data.get(position).get("txtParamEdit1");
+                String param2 = data.get(position).get("txtParamEdit2");
+                String param3 = data.get(position).get("txtParamEdit3");
+                String param4 = data.get(position).get("txtParamEdit4");
 
                 intentEdit.putExtra("nameBoiler", nameBoiler);
                 intentEdit.putExtra("numberBoiler", numberBoiler);
@@ -67,6 +69,11 @@ public class MainActivity extends ActionBarActivity {
             }
             });
 
+        //Resive SMS
+        final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
+        IntentFilter filter = new IntentFilter(SMS_RECEIVED);
+        BroadcastReceiver receiver = new SMSReceiver();
+        registerReceiver(receiver, filter);
     }
 
     protected void onResume() {
